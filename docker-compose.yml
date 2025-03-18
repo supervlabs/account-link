@@ -1,0 +1,114 @@
+
+x-common-env: &common-env
+  NODE_ENV: development
+  NEXT_PUBLIC_GOOGLE_CLIENT_ID: $NEXT_PUBLIC_GOOGLE_CLIENT_ID
+  GOOGLE_CLIENT_SECRET: $GOOGLE_CLIENT_SECRET
+  JWT_SECRET: $JWT_SECRET
+  REDIS_PASSWORD: &REDIS_PASSWORD $REDIS_PASSWORD
+  REDIS_URL: redis://:$REDIS_PASSWORD@redis:6379 # redis://[[username:]password@]host[:port][/db-number]
+  NEXT_PUBLIC_SITE_DOMAIN: $NEXT_PUBLIC_SITE_DOMAIN
+  NEXT_PUBLIC_FRONTEND_URL: $NEXT_PUBLIC_FRONTEND_URL
+  NEXT_PUBLIC_BACKEND_URL: $NEXT_PUBLIC_BACKEND_URL
+  DATABASE_HOST: db
+  DATABASE_USERNAME: &DATABASE_USERNAME svladmin
+  DATABASE_PASSWORD: &DATABASE_PASSWORD $DATABASE_PASSWORD
+  DATABASE_PORT: &DATABASE_PORT 5432
+  DATABASE_NAME: &DATABASE_NAME svldatabase
+  FRONTEND_PORT: $FRONTEND_PORT
+  BACKEND_PORT: $BACKEND_PORT
+  SHARED_API_KEY: $SHARED_API_KEY
+  SERVICE_NAME: $SERVICE_NAME
+
+services:
+  fend:
+    build:
+      dockerfile_inline: |
+        FROM node:20
+        WORKDIR $PWD/fend
+        RUN npm install -g pnpm
+        COPY fend/tsconfig.json \
+            fend/package.json \
+            fend/pnpm-lock.yaml \
+            fend/tailwind.config.ts \
+            fend/postcss.config.mjs \
+            fend/components.json \
+            fend/next.config.ts \
+            fend/eslint.config.mjs \
+            ./
+        COPY fend/app ./app
+        COPY fend/public ./public
+        COPY fend/lib ./lib
+        RUN pnpm install
+        EXPOSE $FRONTEND_PORT
+    ports:
+      - $FRONTEND_PORT:$FRONTEND_PORT
+    environment:
+      <<: *common-env
+      BACKEND_URL: http://bend:$BACKEND_PORT
+    volumes:
+      - $HOME/.aws:/root/.aws
+      - ./fend:$PWD/fend
+      - $PWD/fend/node_modules
+      - $PWD/fend/.next
+    depends_on:
+      - db
+      - redis
+      - bend
+    command: pnpm dev -p $FRONTEND_PORT
+
+  bend:
+    init: true
+    build:
+      dockerfile_inline: |
+        FROM node:20
+        WORKDIR $PWD/bend
+        RUN npm install -g pnpm
+        COPY bend/tsconfig.json bend/package.json bend/pnpm-lock.yaml ./
+        RUN pnpm install
+        EXPOSE $BACKEND_PORT
+    ports:
+      - $BACKEND_PORT:$BACKEND_PORT
+    environment:
+      <<: *common-env
+    volumes:
+      - $HOME/.aws:/root/.aws
+      - ./bend:$PWD/bend
+      - $PWD/bend/node_modules
+    depends_on:
+      - db
+      - redis
+    command: sh -c 'pnpm migration:run && pnpm dev'
+
+  db:
+    image: postgres:16.4
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
+      POSTGRES_DB: *DATABASE_NAME
+      POSTGRES_USER: *DATABASE_USERNAME
+      POSTGRES_PASSWORD: $DATABASE_PASSWORD
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - /etc/localtime:/etc/localtime:ro
+    # ports:
+    #   - 5432:5432
+    shm_size: 1g
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+  redis:
+    image: redis:7.2
+    command: sh -c 'redis-server --requirepass $$REDIS_PASSWORD'
+    environment:
+      REDIS_PASSWORD: $REDIS_PASSWORD
+    # ports:
+    #   - '6379:6379'
+    volumes:
+      - redis-data:/data
+
+volumes:
+  db_data:
+    driver: local
+  redis-data:
+    driver: local

@@ -1,0 +1,28 @@
+<svg viewBox="0 0 800 200" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 100q150-50 400 0t400 0v100H0" fill="#000000" opacity=".3">
+    <animate attributeName="d"
+      values="M 0 100 Q 150 50, 400 100 Q 650 150, 800 100 L 800 200 L 0 200; M 0 100 Q 150 150, 400 100 Q 650 50, 800 100 L 800 200 L 0 200; M 0 100 Q 150 50, 400 100 Q 650 150, 800 100 L 800 200 L 0 200"
+      dur="5s" repeatCount="indefinite" />
+  </path>
+  <path d="M0 120q150-50 400 0t400 0v80H0" fill="rgba(27,55,84,0.527)" opacity=".4">
+    <animate attributeName="d"
+      values="M 0 120 Q 150 70, 400 120 Q 650 170, 800 120 L 800 200 L 0 200; M 0 120 Q 150 170, 400 120 Q 650 70, 800 120 L 800 200 L 0 200; M 0 120 Q 150 70, 400 120 Q 650 170, 800 120 L 800 200 L 0 200"
+      dur="4s" repeatCount="indefinite" />
+  </path>
+  <path d="M0 140q150-50 400 0t400 0v60H0" fill="rgba(0,0,0,0.70)" opacity=".5">
+    <animate attributeName="d"
+      values="M 0 140 Q 150 90, 400 140 Q 650 190, 800 140 L 800 200 L 0 200; M 0 140 Q 150 190, 400 140 Q 650 90, 800 140 L 800 200 L 0 200; M 0 140 Q 150 90, 400 140 Q 650 190, 800 140 L 800 200 L 0 200"
+      dur="3s" repeatCount="indefinite" />
+  </path>
+  <g fill="#fff">
+    <circle cx="200" cy="120" r="2" opacity=".6">
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="2s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="400" cy="150" r="2" opacity=".6">
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="2.5s" repeatCount="indefinite" />
+    </circle>
+    <circle cx="600" cy="130" r="2" opacity=".6">
+      <animate attributeName="opacity" values="0.6;0.9;0.6" dur="1.8s" repeatCount="indefinite" />
+    </circle>
+  </g>
+</svg>

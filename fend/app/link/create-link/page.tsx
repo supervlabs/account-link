@@ -19,7 +19,7 @@ import { setLink } from "@/lib/fetches";
 
 export default function CreateLinkPage() {
   const [userLinkUri, setUserLinkUri] = useState(
-    `${process.env.NEXT_PUBLIC_FRONTEND_URL}/api/user_link`
+    `${process.env.NEXT_PUBLIC_FRONTEND_URL}/link`
   );
   const [redirectUri, setRedirectUri] = useState(`/`);
   const [loading, setLoading] = useState(false);
